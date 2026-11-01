@@ -10,12 +10,23 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
+
+      - name: Unpack project zip (if project is uploaded as a zip)
+        run: |
+          if [ -z "$(find . -name settings.gradle.kts -not -path './.git/*' | head -n1)" ]; then
+            Z=$(find . -maxdepth 2 -name "*.zip" -not -path "./.git/*" | head -n1)
+            if [ -n "$Z" ]; then
+              echo "Распаковываю $Z"
+              mkdir -p _src
+              unzip -oq "$Z" -d _src
+            fi
+          fi
 
       - name: Find project root
         run: |
@@ -150,7 +161,7 @@ jobs:
           yes | "$SDKM" --licenses > /dev/null || true
           "$SDKM" "platforms;android-36" "build-tools;36.0.0"
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: "8.14.3"
 
@@ -194,13 +205,13 @@ jobs:
 
       - name: Upload full log
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: build-log
           path: build.log
           if-no-files-found: ignore
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: LiquidFiles-apk
           path: out/*.apk
