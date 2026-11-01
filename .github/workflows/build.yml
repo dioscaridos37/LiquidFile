@@ -1,9 +1,6 @@
 name: Build APK
 
-on:
-  workflow_dispatch:
-  push:
-    branches: [ main, master ]
+on: [push, workflow_dispatch]
 
 permissions:
   contents: read
@@ -20,9 +17,7 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      # Android SDK уже предустановлен на ubuntu-latest (ANDROID_HOME),
-      # отдельный android-actions/setup-android не нужен.
-      - name: Install Android 16 (API 36) SDK
+      - name: Install Android SDK 36
         run: |
           SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
           yes | "$SDKM" --licenses > /dev/null || true
